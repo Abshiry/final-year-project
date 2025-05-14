@@ -50,6 +50,54 @@
             margin-top: 0;
             color: #333;
         }
+        .movie-card {
+            margin-bottom: 30px;
+            border: 1px solid #cfc7c7;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            background-color: rgb(255, 255, 255);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .movie-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: scale(1.02);
+            cursor: pointer;
+        }
+        .movie-poster {
+            flex: 0 0 150px;
+            margin-right: 20px;
+        }
+        .movie-poster img {
+            max-width: 100%;
+            border-radius: 4px;
+        }
+        .movie-info {
+            flex: 1;
+        }
+        .movie-title {
+            font-size: 1.4em;
+            margin: 0 0 5px 0;
+        }
+        .movie-meta {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .movie-plot {
+            margin-bottom: 10px;
+        }
+        .ai-reason {
+            background-color: #e6f7ff;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #1890ff;
+            margin-top: 10px;
+        }
+        .imdb-rating {
+            font-weight: bold;
+            color: #e3b71e;
+        }
     </style>
 </head>
 <body>
@@ -62,15 +110,45 @@
             <button type="submit">Get Recommendations</button>
         </form>
 
-        {# Display recommendations only if they exist #}
         {% if recommendations %}
             <div class="results">
                 <h2>Recommendations</h2>
-                {# Use safe filter to render HTML line breaks etc. if the model provides them #}
-                <p>{{ recommendations | safe }}</p>
+                {% for movie in recommendations %}
+                    <a href="https://www.imdb.com/title/{{ movie.details.imdbID }}/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+                        <div class="movie-card">
+                            <div class="movie-poster">
+                                {% if movie.details.Poster != "N/A" %}
+                                    <img src="{{ movie.details.Poster }}" alt="{{ movie.details.Title }} poster">
+                                {% else %}
+                                    <div class="no-poster">No poster available</div>
+                                {% endif %}
+                            </div>
+                            <div class="movie-info">
+                                <h3 class="movie-title">{{ movie.details.Title }} ({{ movie.details.Year }})</h3>
+                                <div class="movie-meta">
+                                    {{ movie.details.Rated }} | {{ movie.details.Runtime }} | {{ movie.details.Genre }}
+                                </div>
+                                <div class="movie-meta">
+                                    Director: {{ movie.details.Director }}
+                                </div>
+                                <div class="movie-meta">
+                                    Actors: {{ movie.details.Actors }}
+                                </div>
+                                <div class="movie-meta">
+                                    <span class="imdb-rating">IMDb: {{ movie.details.imdbRating }}/10</span>
+                                </div>
+                                <div class="movie-plot">
+                                    <strong>Plot:</strong> {{ movie.details.Plot }}
+                                </div>
+                                <div class="ai-reason">
+                                    <strong>Why we recommend this:</strong> {{ movie.reason }}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
             </div>
         {% endif %}
-
     </div>
 </body>
 </html>
